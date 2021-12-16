@@ -1,0 +1,67 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bolderizer</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍚</text></svg>"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
+    />
+    <style>
+      :root {
+        --primary: #5e35b1;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>🍚 𝗕𝗼𝗹𝗱𝗲𝗿𝗶𝘇𝗲𝗿</h1>
+      <label>Input</label>
+      <textarea id="input" text="sd"></textarea>
+
+      <label>Output</label>
+      <textarea id="output" text="sa"></textarea>
+      <button id="copy">⧉ COPY</button>
+
+      <div class="grid" style="place-items: center">
+        <small>
+          A privacy friendly converter made by
+          <a href="https://github.com/aloisdg/" title="aloisdg's GitHub"
+            >aloisdg</a
+          >.
+        </small>
+      </div>
+    </main>
+
+    <script>
+      const upperDifference = "𝗔".codePointAt(0) - "A".codePointAt(0);
+      const lowerDifference = "𝗮".codePointAt(0) - "a".codePointAt(0);
+
+      const bolderize = (letter) => {
+        const n = letter.charCodeAt(0);
+        if (n >= 65 && n < 91) {
+          return String.fromCodePoint(n + upperDifference);
+        } else if (n >= 97 && n < 123) {
+          return String.fromCodePoint(n + lowerDifference);
+        } else return letter;
+      };
+
+      document.querySelector("#copy").onclick = () => {
+        navigator.clipboard.writeText(document.querySelector("#output").value);
+      };
+
+      document.querySelector("#input").oninput = () => {
+        document.querySelector("#output").value = [
+          ...document.querySelector("#input").value,
+        ]
+          .map(bolderize)
+          .join("");
+      };
+    </script>
+  </body>
+</html>
