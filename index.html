@@ -13,55 +13,93 @@
       href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
     />
     <style>
-      :root {
-        --primary: #5e35b1;
+      @media only screen and (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) {
+          color-scheme: light;
+          --primary: #432975;
+          --primary-hover: #2d1c4f;
+          --primary-focus: #2d1c4f;
+        }
+      }
+
+      @media only screen and (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          color-scheme: dark;
+          --primary: #009f82;
+          --primary-hover: #00d7b0;
+          --primary-focus: #00d7b0;
+        }
       }
     </style>
   </head>
-  <body>
+  <body class="grid" style="grid-template-rows: auto 1fr auto">
+    <header class="container">
+      <h1 style="margin-bottom: 0">🍚 𝗕𝗼𝗹𝗱𝗲𝗿𝗶𝘇𝗲𝗿</h1>
+    </header>
+
     <main class="container">
-      <h1>🍚 𝗕𝗼𝗹𝗱𝗲𝗿𝗶𝘇𝗲𝗿</h1>
+      <div class="grid" style="place-items: end">
+        <label for="switch">
+          <input type="checkbox" id="switch" name="switch" role="switch" />
+          Bold only between <code>__</code> or <code>**</code>
+        </label>
+      </div>
       <label>Input</label>
       <textarea id="input" text="sd"></textarea>
 
       <label>Output</label>
       <textarea id="output" text="sa"></textarea>
       <button id="copy">⧉ COPY</button>
-
-      <div class="grid" style="place-items: center">
-        <small>
-          A privacy friendly converter made by
-          <a href="https://github.com/aloisdg/" title="aloisdg's GitHub"
-            >aloisdg</a
-          >.
-        </small>
-      </div>
     </main>
 
+    <footer class="container" style="text-align: center">
+      <small style="display: block">
+        A privacy friendly converter made by
+        <a href="https://github.com/d-edge/" title="D-EDGE's GitHub">D-EDGE</a>.
+      </small>
+      <small style="display: block">
+        Hey! We are hiring a
+        <a
+          href="https://www.linkedin.com/jobs/view/2834811344/"
+          title="job post"
+          >Social Media Manager</a
+        >.
+      </small>
+    </footer>
     <script>
-      const upperDifference = "𝗔".codePointAt(0) - "A".codePointAt(0);
-      const lowerDifference = "𝗮".codePointAt(0) - "a".codePointAt(0);
+      const upperDiff = "𝗔".codePointAt(0) - "A".codePointAt(0);
+      const lowerDiff = "𝗮".codePointAt(0) - "a".codePointAt(0);
 
-      const bolderize = (letter) => {
-        const n = letter.charCodeAt(0);
-        if (n >= 65 && n < 91) {
-          return String.fromCodePoint(n + upperDifference);
-        } else if (n >= 97 && n < 123) {
-          return String.fromCodePoint(n + lowerDifference);
-        } else return letter;
+      const isUpper = (n) => n >= 65 && n < 91;
+      const isLower = (n) => n >= 97 && n < 123;
+
+      const bolderize = (char) => {
+        const n = char.charCodeAt(0);
+        if (isUpper(n)) return String.fromCodePoint(n + upperDiff);
+        if (isLower(n)) return String.fromCodePoint(n + lowerDiff);
+        return char;
       };
 
-      document.querySelector("#copy").onclick = () => {
+      const bolderizeWord = (word) => [...word].map(bolderize).join("");
+
+      const bolderizeMarkdown = (chars) =>
+        chars
+          .replace(/__(.*?)__/g, (_, p1) => bolderizeWord(p1))
+          .replace(/\*\*(.*?)\*\*/g, (_, p1) => bolderizeWord(p1));
+
+      const update = (chars, isMarkdown) =>
+        (document.querySelector("#output").value = isMarkdown
+          ? bolderizeMarkdown(chars)
+          : bolderizeWord(chars));
+
+      document.querySelector("#copy").onclick = () =>
         navigator.clipboard.writeText(document.querySelector("#output").value);
-      };
 
-      document.querySelector("#input").oninput = () => {
-        document.querySelector("#output").value = [
-          ...document.querySelector("#input").value,
-        ]
-          .map(bolderize)
-          .join("");
-      };
+      document.querySelector("#switch").onchange = (e) =>
+        update(document.querySelector("#input").value, e.target.checked);
+
+      document.querySelector("#input").oninput = (e) =>
+        update(e.target.value, document.querySelector("#switch").checked);
     </script>
   </body>
 </html>
